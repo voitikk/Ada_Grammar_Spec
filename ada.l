@@ -55,7 +55,7 @@
 "others"                    { return OTHERS; }
 "=>"                        { return ARROW; }
 [0-9]+                      {yylval.integer = atoi(yytext); return NUMBER;}
-[a-z][a-zA-Z0-9\_]*         {yylval.var = malloc(sizeof(yytext)); yylval.var = strdup(yytext); return ID;} 
+[a-zA-Z][a-zA-Z0-9\_]*         {yylval.var = malloc(sizeof(yytext)); yylval.var = strdup(yytext); return ID;} 
 .                           {return yytext[0];}
 
    

@@ -1,7 +1,7 @@
 %{
 	/* Alex Voitik          */
 	/* ada.y                */
-	/* Last Edit: 9/21/2016 */
+	/* Last Edit: 10/24/2016 */
 %}
 
 %token IS BEG END PROCEDURE ID NUMBER TYPE ARRAY RAISE OTHERS
@@ -16,145 +16,199 @@
 }
 %%
 
-program                                                : main_body {printf ("\n*****\nDone.\n*****\n");}
-                                                       ;
-			
-main_body                                              : main_specification IS
-                                                         declarative_part BEG
-                                                       | main_specification IS BEG
-                                                       ;
-			
-main_specification /*DONE*/                            : PROCEDURE ID
-;
-						   
-
-declarative_part                                       : /*subprogram_body_decl|*/ decl
-                                                       ;
-							
-decl 						                           : object_decl
-							                         /*| type_decl */
-							                         /*| subtype_decl */
-							                         /*| pragma */
-							                         /*| subprogram_decl */
-							                         /*| id_list EXCEPTION */
-                                                       ;
-							
-object_decl /*DONE*/ 				                   : id_list ':' constant_option type_or_subtype initialization_option ';'
-							                           ;
-							
-id_list /*DONE*/ 					                   : id ',' id_list
-                                                       | id 
-							                           ;
-							
-id /*DONE*/                                            : ID
+program	: main_body {printf ("\n*****\nDone.\n*****\n");}
+;		
+main_body : main_spec IS
+declarative_part BEG
+seq_of_stmts
+except_part END ';'
 ;
 
-constant_option	/*DONE*/		                       : NUMBER
-                                                       | /* Empty */
-							                           ;
-		
-type_or_subtype	/*DONE*/		  	                   : type
-                                                       | subtype_def
-							                           ;
-			
-type /*DONE*/                                          : type_name
-                                                       | type_def
-                                                       ;
+main_spec : PROCEDURE ID
+;
 
-type_name /*DONE*/                                     : id
-                                                       ;
+procedure_body : procedure_spec IS
+declarative_part BEG
+seq_of_stmts
+except_part END ';'
+;
 
-type_def /*DONE*/                                      : record_type_def
-                                                       | array_type_def
-                                                       | enum_type_def
-		                                             /*| ACCESS subtype */
-                                                       ;
+procedure_spec : PROCEDURE ID formal_param_part
+;
+formal_param_part : '(' parameters ')'
+| /*empty*/
+;
+parameters : id_list ':' mode type_name ';' parameters
+| id_list ':' mode type_name 
+;
+id_list : ID ',' id_list
+| ID
+;
+mode : IN
+| OUT
+| IN OUT
+| /*empty -- default is in*/
+; 
 
-record_type_def /*DONE*/                               : RECORD component_list ENDREC
-                                                       | RECORD component_null ENDREC
-						                             /*| RECORD component_list variant_part ENDREC */
-                                                       ;
+type_name : ID /*Define Integer, Boolean, Float, String*/
+; 
 
-component_list /*DONE*/                                : component_decl
-                                                       | component_decl component_list
-                                                       ;
+declarative_part : array_type ';' declarative_part
+				   | record_type ';' declarative_part
+				   | name_type ';' declarative_part
+				   | variable_decl ';' declarative_part
+				   | constant_type ';' declarative_part
+				   | exception_type ';' declarative_part
+| procedure_body declarative_part
+| /*empty*/
+;
 
-component_null /*DONE*/                                : NULLWORD ';'
-                                                       ;
+array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant ')' OF type_name
+;
+constant : ID
+| NUMBER
+;
 
-component_decl /*DONE*/                                : id_list ':' type_or_subtype initialization_option ';'
-                                                       ;
+record_type : TYPE ID IS RECORD component_list ENDREC
+;
 
-/*variant_part : DO NOT HAVE CASE OR END CASE IN .L FILE  */
+component_list : variable_decl ';' component_list
+| /*empty*/
+;
 
-array_type_def /*DONE*/                                : unconstrained_array_def
-                                                       | constrained_array_def
-                                                       ;
+variable_decl : id_list ':' type_name
+;
 
-unconstrained_array_def /*DONE*/                       : ARRAY unconstrained_index_list OF element_type
-                                                       ;
+name_type : TYPE ID IS RANGE constant DOTDOT constant
+;
 
-unconstrained_index_list /*DONE*/                      : '(' index_subtype_def ')'
-                                                       | '(' index_subtype_def ',' unconstrained_index_list_end
-                                                       ;
+constant_type : id_list ':' CONSTANT ASSIGN constant_expr
+;
 
-unconstrained_index_list_end /*DONE*/                  : index_subtype_def ')'
-                                                       | index_subtype_def ',' unconstrained_index_list_end
-                                                       ;
+exception_type : id_list ':' EXCEPTION
+;
 
-index_subtype_def /*DONE*/                             : type_name RANGE /* <> NEED BOX? */
-                                                       ;
+constant_expr : NUMBER ;
 
-element_type /*DONE*/                                  : type_or_subtype
-                                                       ;
 
-constrained_array_def /*DONE*/                         : ARRAY constrained_index_list OF element_type
-                                                       ;
+seq_of_stmts : stmt_type seq_of_stmts
+| /*empty*/
+;
 
-constrained_index_list /*DONE*/                        : '(' discreet_range ')'
-                                                       | '(' discreet_range ',' constrained_index_end
-                                                       ;
+stmt_type : NULLWORD ';'
+| assignment_stmt ';'
+| procedure_call ';'
+| loop_stmt ';'
+| if_stmt ';'
+| raise_exc ';'
+| expression ';'
+;
 
-constrained_index_end /*DONE*/                         : discreet_range ')'
-                                                       | discreet_range ',' constrained_index_end
-                                                       ;
+assignment_stmt : ID ASSIGN expression; 
 
-discreet_range /*DONE*/                                : subtype
-                                                       | range
-                                                       ;
 
-subtype /*DONE*/                                       : type_name
-                                                       | subtype_def
-                                                       ;
+loop_stmt : LOOP seq_of_stmts loop_exit ENDLOOP
+;
 
-range /*DONE*/                                         : simple_expression DOTDOT simple_expression
-                                                       ;
+loop_exit : EXIT ';'
+| EXITWHEN expression ';'
+| /*empty*/
+;
 
-simple_expression /*DONE*/                             : unary_adding_op
-                                                       | term
-                                                       | term adding_op term
-                                                       | unary_adding_op term
-                                                       | unary_adding_op term adding_op term
-                                                       ;
+if_stmt : IF expression THEN seq_of_stmts if_cont ENDIF
+;
 
-unary_adding_op                                        : RAISE
-                                                       ;
+if_cont : ELSEIF expression THEN seq_of_stmts if_cont
+| ELSE seq_of_stmts
+| /*empty*/
+;
 
-term                                                   : NUMBER
-                                                       ;
+raise_exc : RAISE ID;
 
-adding_op                                              : EQ
-                                                       ;
+procedure_call : ID optional_actual_parameter_part
+;
 
-enum_type_def                                          : AND
-                                                       ;
+expression :  relation bool_list
+;
 
-subtype_def                                            : ELSE
-                                                       ;
- 				
-initialization_option	                               : EXP
-						                               ;
-				 
+bool_list : boolean_op relation bool_list
+| /*empty*/
+;
+
+relation : simple_expr relational_op_list
+;
+
+relational_op_list : relational_op simple_expr relational_op_list
+| /*empty*/
+;
+
+simple_expr : term adding_op_list
+| '-' term adding_op_list
+;
+
+adding_op_list : adding_op term adding_op_list
+| /*empty*/
+;
+
+term : factor mult_op_list
+;
+
+mult_op_list : multiplying_op factor mult_op_list
+| /*empty*/
+;
+
+factor : primary exp_list
+| NOT primary
+;
+
+exp_list : EXP primary exp_list
+| /*empty*/
+;
+primary : NUMBER 
+| ID 
+| '(' expression ')'
+;
+
+boolean_op : AND 
+| OR
+;
+
+relational_op : EQ 
+| NEQ 
+| LT 
+| LTE 
+| GT 
+| GTE
+;
+
+adding_op : '+' 
+| '-'
+;
+
+multiplying_op : '*' 
+| '/'
+;
+
+optional_actual_parameter_part : '(' actual_parameter ')'
+;
+
+actual_parameter : expression ',' actual_parameter
+| expression
+;
+
+except_part : EXCEPTION exception_body
+| /*empty*/
+;
+
+exception_body : WHEN choice_sequence ARROW seq_of_stmts exception_body
+| WHEN OTHERS ARROW seq_of_stmts
+| /*empty*/
+;
+
+choice_sequence : ID choice_sequence
+| '|' ID choice_sequence
+| /*empty*/
+;			 
 
 %%
 #include <stdio.h>
@@ -164,7 +218,7 @@ main()
 {
     printf("About to scan. . . . . .\n");
 	// open a file handle to a particular file:
-	FILE *myfile = fopen("test.adb", "r");
+	FILE *myfile = fopen("Gexcept.ada", "r"); //THIS IS WHERE YOU PUT THE PARSE FILE
 	// make sure it is valid:
 	if (!myfile) {
 		printf("I can't open the file!\n");
