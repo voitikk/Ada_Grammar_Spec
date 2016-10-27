@@ -2,17 +2,23 @@
 	/* Alex Voitik          */
 	/* ada.y                */
 	/* Last Edit: 10/24/2016 */
+
+	extern int lineno;
+
 %}
 
 %token IS BEG END PROCEDURE ID NUMBER TYPE ARRAY RAISE OTHERS
 %token RECORD IN OUT RANGE CONSTANT ASSIGN EXCEPTION NULLWORD LOOP IF
 %token THEN ELSEIF ELSE EXIT WHEN AND OR EQ NEQ LT GT GTE LTE TICK
 %token NOT EXP ARROW OF DOTDOT ENDIF ENDREC ENDLOOP EXITWHEN
-%type <integer> NUMBER
+%type <integer> NUMBER 
 %type <var> ID
+%type <var> type_name
+%type <listptr> id_list
 %union {
     int integer;
     char *var;
+    struct idnode *listptr;	
 }
 %%
 
@@ -41,8 +47,26 @@ formal_param_part : '(' parameters ')'
 parameters : id_list ':' mode type_name ';' parameters
 | id_list ':' mode type_name 
 ;
-id_list : ID ',' id_list
+
+
+id_list : ID ',' id_list 
+{
+	aList = malloc(sizeof(struct idnode));
+	(*aList).next = $3;
+	(*aList).name = malloc(strlen($1)+1);
+	strcpy((*aList).name, $1);
+	$$ = aList;
+}
+
 | ID
+{
+	aList = malloc(sizeof(struct idnode));
+	(*aList).next = NULL;
+	(*aList).name = malloc(strlen($1)+1);
+	strcpy((*aList).name, $1);
+	$$ = aList;
+}
+
 ;
 mode : IN
 | OUT
@@ -50,7 +74,12 @@ mode : IN
 | /*empty -- default is in*/
 ; 
 
-type_name : ID /*Define Integer, Boolean, Float, String*/
+type_name : ID 
+{
+	$$ = malloc(sizeof(strlen($1)+1));
+	strcpy($$, $1);
+}
+ 
 ; 
 
 declarative_part : array_type ';' declarative_part
@@ -76,7 +105,14 @@ component_list : variable_decl ';' component_list
 | /*empty*/
 ;
 
+
 variable_decl : id_list ':' type_name
+{
+	printf("Line no %d: ", lineno + 1);
+	print_list($1);
+	printf(" : %s\n", $<var>3);
+}
+
 ;
 
 name_type : TYPE ID IS RANGE constant DOTDOT constant
@@ -213,23 +249,9 @@ choice_sequence : ID choice_sequence
 %%
 #include <stdio.h>
 #include <string.h>
-extern FILE *yyin;
+#include "struct_def.h"
 main()
 {
-    printf("About to scan. . . . . .\n");
-	// open a file handle to a particular file:
-	FILE *myfile = fopen("Gexcept.ada", "r"); //THIS IS WHERE YOU PUT THE PARSE FILE
-	// make sure it is valid:
-	if (!myfile) {
-		printf("I can't open the file!\n");
-		return -1;
-	}
-	// set lex to read from it instead of defaulting to STDIN:
-	yyin = myfile;
-	
-	// parse through the input until there is no more:
-	do {
-		yyparse();
-	} while (!feof(yyin));
+	yyparse();
 	
 }

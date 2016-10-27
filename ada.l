@@ -60,3 +60,7 @@
 
    
 %%
+
+yyerror(char *s){
+	printf("%d : %s at the %s symbol.\n", lineno, s, yytext);
+}
