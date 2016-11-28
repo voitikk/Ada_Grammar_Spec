@@ -2,7 +2,7 @@
 
 Alex Voitik
 struct_def.h
-last edit: 11/27/2016
+last edit: 10/30/2016
 **************************/
 
 typedef struct idnode {
@@ -14,11 +14,13 @@ typedef struct idnode {
 idnodeptr aList = NULL;
 
 void print_list(idnodeptr node){
-	if(node != NULL){
-		printf("%s ", node -> name);
-		while(node -> next != NULL){
-			node = node -> next;
-			printf("%s ", node -> name);
+	
+	idnodeptr check = node;
+	while(check != NULL){
+		if(check -> name != NULL){
+			printf("%s ", check -> name);
 		}
+	check = check->next;
 	}
 }
+

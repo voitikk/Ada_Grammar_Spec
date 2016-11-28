@@ -1,0 +1,31 @@
+0 b := ?
+1 contents b, 0 := ?
+2 contents b, 1 := 4
+3 pc := ?
+4 halt
+5 read_integer contents b, 5
+6 contents b, 7 := true
+7 r2 := contents b, 5 + contents b, 5
+8 r3 := contents b, 7 and contents b, 7
+9 write r2
+10 write r3
+11 read_integer contents b, 6
+12 r4 := 2
+13 r5 := contents b, 6 * r4
+14 contents b, 4 := r5
+15 r7 := contents b, 6 + contents b, 6
+16 r9 := contents b, 6 + contents b, 4
+17 write contents b, 6
+18 write r5
+19 write r7
+20 write r9
+21 r10 := contents b, 1
+22 b := contents b, 3
+23 pc := r10
+
+
+PATCH_LIST
+**********
+Line 0 : 24
+Line 1 : 25
+Line 3 : 5

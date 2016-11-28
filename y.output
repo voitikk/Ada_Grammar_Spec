@@ -1,0 +1,1971 @@
+   0  $accept : program $end
+
+   1  program : main_body
+
+   2  $$1 :
+
+   3  main_body : main_spec IS declarative_part BEG $$1 seq_of_stmts except_part END ';'
+
+   4  main_spec : PROCEDURE ID
+
+   5  $$2 :
+
+   6  $$3 :
+
+   7  procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 seq_of_stmts except_part END ';'
+
+   8  procedure_spec : procedure_head '(' formal_param_part ')'
+   9                 | procedure_head
+
+  10  procedure_head : PROCEDURE ID
+
+  11  formal_param_part : parameters
+  12                    |
+
+  13  parameters : id_list ':' mode type_name ';' parameters
+  14             | id_list ':' mode type_name
+
+  15  identifier : ID
+
+  16  id_list : identifier ',' id_list
+  17          | identifier
+
+  18  mode : IN
+  19       | OUT
+  20       | IN OUT
+  21       |
+
+  22  type_name : identifier
+
+  23  declarative_part : decl_list procedure_decl_list
+
+  24  procedure_decl_list : procedure_body procedure_decl_list
+  25                      |
+
+  26  decl_list : decl ';' decl_list
+  27            |
+
+  28  decl : array_type
+  29       | record_type
+  30       | name_type
+  31       | variable_decl
+  32       | constant_type
+  33       | exception_type
+
+  34  array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant ')' OF type_name
+
+  35  constant : NUMBER
+
+  36  record_type : TYPE ID IS RECORD component_list ENDREC
+
+  37  component_list : variable_decl ';' component_list
+  38                 |
+
+  39  variable_decl : id_list ':' type_name
+
+  40  name_type : TYPE ID IS RANGE constant DOTDOT constant
+
+  41  constant_type : id_list ':' CONSTANT ASSIGN constant_expr
+
+  42  exception_type : id_list ':' EXCEPTION
+
+  43  constant_expr : NUMBER
+
+  44  seq_of_stmts : stmt_type ';' seq_of_stmts
+  45               | stmt_type ';'
+
+  46  stmt_type : NULLWORD
+  47            | assignment_stmt
+  48            | procedure_call
+  49            | loop_stmt
+  50            | if_stmt
+  51            | raise_exc
+
+  52  assignment_stmt : identifier ASSIGN expression
+
+  53  loop_stmt : LOOP seq_of_stmts loop_exit ENDLOOP
+
+  54  loop_exit : EXIT ';'
+  55            | EXITWHEN expression ';'
+  56            |
+
+  57  if_stmt : IF expression THEN seq_of_stmts if_cont ENDIF
+
+  58  if_cont : ELSEIF expression THEN seq_of_stmts if_cont
+  59          | ELSE seq_of_stmts
+  60          |
+
+  61  raise_exc : RAISE ID
+
+  62  procedure_call : proc_params
+
+  63  proc_params : identifier optional_params
+  64              | identifier
+
+  65  optional_params : '(' function_params ')'
+
+  66  function_params : expression ',' function_params
+  67                  | expression
+
+  68  expression : relation
+  69             | expression boolean_op relation
+
+  70  relation : simple_expr
+  71           | relation relational_op simple_expr
+
+  72  simple_expr : term
+  73              | simple_expr adding_op term
+
+  74  term : factor
+  75       | term multiplying_op factor
+
+  76  factor : primary
+  77         | primary EXP primary
+  78         | NOT primary
+  79         | '-' primary
+
+  80  primary : NUMBER
+  81          | identifier
+  82          | '(' expression ')'
+
+  83  boolean_op : AND
+  84             | OR
+
+  85  relational_op : EQ
+  86                | NEQ
+  87                | LT
+  88                | LTE
+  89                | GT
+  90                | GTE
+
+  91  adding_op : '+'
+  92            | '-'
+
+  93  multiplying_op : '*'
+  94                 | '/'
+
+  95  except_part : EXCEPTION exception_body
+  96              |
+
+  97  exception_body : WHEN choice_sequence ARROW seq_of_stmts exception_body
+  98                 | WHEN OTHERS ARROW seq_of_stmts
+  99                 |
+
+ 100  choice_sequence : ID choice_sequence
+ 101                  | '|' ID choice_sequence
+ 102                  |
+
+state 0
+	$accept : . program $end  (0)
+
+	PROCEDURE  shift 1
+	.  error
+
+	program  goto 2
+	main_body  goto 3
+	main_spec  goto 4
+
+
+state 1
+	main_spec : PROCEDURE . ID  (4)
+
+	ID  shift 5
+	.  error
+
+
+state 2
+	$accept : program . $end  (0)
+
+	$end  accept
+
+
+state 3
+	program : main_body .  (1)
+
+	.  reduce 1
+
+
+state 4
+	main_body : main_spec . IS declarative_part BEG $$1 seq_of_stmts except_part END ';'  (3)
+
+	IS  shift 6
+	.  error
+
+
+state 5
+	main_spec : PROCEDURE ID .  (4)
+
+	.  reduce 4
+
+
+state 6
+	main_body : main_spec IS . declarative_part BEG $$1 seq_of_stmts except_part END ';'  (3)
+	decl_list : .  (27)
+
+	ID  shift 7
+	TYPE  shift 8
+	BEG  reduce 27
+	PROCEDURE  reduce 27
+
+	id_list  goto 9
+	identifier  goto 10
+	declarative_part  goto 11
+	decl_list  goto 12
+	decl  goto 13
+	array_type  goto 14
+	record_type  goto 15
+	name_type  goto 16
+	variable_decl  goto 17
+	constant_type  goto 18
+	exception_type  goto 19
+
+
+state 7
+	identifier : ID .  (15)
+
+	.  reduce 15
+
+
+state 8
+	array_type : TYPE . ID IS ARRAY '(' constant DOTDOT constant ')' OF type_name  (34)
+	record_type : TYPE . ID IS RECORD component_list ENDREC  (36)
+	name_type : TYPE . ID IS RANGE constant DOTDOT constant  (40)
+
+	ID  shift 20
+	.  error
+
+
+state 9
+	variable_decl : id_list . ':' type_name  (39)
+	constant_type : id_list . ':' CONSTANT ASSIGN constant_expr  (41)
+	exception_type : id_list . ':' EXCEPTION  (42)
+
+	':'  shift 21
+	.  error
+
+
+state 10
+	id_list : identifier . ',' id_list  (16)
+	id_list : identifier .  (17)
+
+	','  shift 22
+	':'  reduce 17
+
+
+state 11
+	main_body : main_spec IS declarative_part . BEG $$1 seq_of_stmts except_part END ';'  (3)
+
+	BEG  shift 23
+	.  error
+
+
+state 12
+	declarative_part : decl_list . procedure_decl_list  (23)
+	procedure_decl_list : .  (25)
+
+	PROCEDURE  shift 24
+	BEG  reduce 25
+
+	procedure_head  goto 25
+	procedure_body  goto 26
+	procedure_spec  goto 27
+	procedure_decl_list  goto 28
+
+
+state 13
+	decl_list : decl . ';' decl_list  (26)
+
+	';'  shift 29
+	.  error
+
+
+state 14
+	decl : array_type .  (28)
+
+	.  reduce 28
+
+
+state 15
+	decl : record_type .  (29)
+
+	.  reduce 29
+
+
+state 16
+	decl : name_type .  (30)
+
+	.  reduce 30
+
+
+state 17
+	decl : variable_decl .  (31)
+
+	.  reduce 31
+
+
+state 18
+	decl : constant_type .  (32)
+
+	.  reduce 32
+
+
+state 19
+	decl : exception_type .  (33)
+
+	.  reduce 33
+
+
+state 20
+	array_type : TYPE ID . IS ARRAY '(' constant DOTDOT constant ')' OF type_name  (34)
+	record_type : TYPE ID . IS RECORD component_list ENDREC  (36)
+	name_type : TYPE ID . IS RANGE constant DOTDOT constant  (40)
+
+	IS  shift 30
+	.  error
+
+
+state 21
+	variable_decl : id_list ':' . type_name  (39)
+	constant_type : id_list ':' . CONSTANT ASSIGN constant_expr  (41)
+	exception_type : id_list ':' . EXCEPTION  (42)
+
+	ID  shift 7
+	CONSTANT  shift 31
+	EXCEPTION  shift 32
+	.  error
+
+	type_name  goto 33
+	identifier  goto 34
+
+
+state 22
+	id_list : identifier ',' . id_list  (16)
+
+	ID  shift 7
+	.  error
+
+	id_list  goto 35
+	identifier  goto 10
+
+
+state 23
+	main_body : main_spec IS declarative_part BEG . $$1 seq_of_stmts except_part END ';'  (3)
+	$$1 : .  (2)
+
+	.  reduce 2
+
+	$$1  goto 36
+
+
+state 24
+	procedure_head : PROCEDURE . ID  (10)
+
+	ID  shift 37
+	.  error
+
+
+state 25
+	procedure_spec : procedure_head . '(' formal_param_part ')'  (8)
+	procedure_spec : procedure_head .  (9)
+
+	'('  shift 38
+	IS  reduce 9
+
+
+state 26
+	procedure_decl_list : procedure_body . procedure_decl_list  (24)
+	procedure_decl_list : .  (25)
+
+	PROCEDURE  shift 24
+	BEG  reduce 25
+
+	procedure_head  goto 25
+	procedure_body  goto 26
+	procedure_spec  goto 27
+	procedure_decl_list  goto 39
+
+
+state 27
+	procedure_body : procedure_spec . IS $$2 declarative_part BEG $$3 seq_of_stmts except_part END ';'  (7)
+
+	IS  shift 40
+	.  error
+
+
+state 28
+	declarative_part : decl_list procedure_decl_list .  (23)
+
+	.  reduce 23
+
+
+state 29
+	decl_list : decl ';' . decl_list  (26)
+	decl_list : .  (27)
+
+	ID  shift 7
+	TYPE  shift 8
+	BEG  reduce 27
+	PROCEDURE  reduce 27
+
+	id_list  goto 9
+	identifier  goto 10
+	decl_list  goto 41
+	decl  goto 13
+	array_type  goto 14
+	record_type  goto 15
+	name_type  goto 16
+	variable_decl  goto 17
+	constant_type  goto 18
+	exception_type  goto 19
+
+
+state 30
+	array_type : TYPE ID IS . ARRAY '(' constant DOTDOT constant ')' OF type_name  (34)
+	record_type : TYPE ID IS . RECORD component_list ENDREC  (36)
+	name_type : TYPE ID IS . RANGE constant DOTDOT constant  (40)
+
+	ARRAY  shift 42
+	RECORD  shift 43
+	RANGE  shift 44
+	.  error
+
+
+state 31
+	constant_type : id_list ':' CONSTANT . ASSIGN constant_expr  (41)
+
+	ASSIGN  shift 45
+	.  error
+
+
+state 32
+	exception_type : id_list ':' EXCEPTION .  (42)
+
+	.  reduce 42
+
+
+state 33
+	variable_decl : id_list ':' type_name .  (39)
+
+	.  reduce 39
+
+
+state 34
+	type_name : identifier .  (22)
+
+	.  reduce 22
+
+
+state 35
+	id_list : identifier ',' id_list .  (16)
+
+	.  reduce 16
+
+
+state 36
+	main_body : main_spec IS declarative_part BEG $$1 . seq_of_stmts except_part END ';'  (3)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 52
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 37
+	procedure_head : PROCEDURE ID .  (10)
+
+	.  reduce 10
+
+
+state 38
+	procedure_spec : procedure_head '(' . formal_param_part ')'  (8)
+	formal_param_part : .  (12)
+
+	ID  shift 7
+	')'  reduce 12
+
+	id_list  goto 59
+	identifier  goto 10
+	formal_param_part  goto 60
+	parameters  goto 61
+
+
+state 39
+	procedure_decl_list : procedure_body procedure_decl_list .  (24)
+
+	.  reduce 24
+
+
+state 40
+	procedure_body : procedure_spec IS . $$2 declarative_part BEG $$3 seq_of_stmts except_part END ';'  (7)
+	$$2 : .  (5)
+
+	.  reduce 5
+
+	$$2  goto 62
+
+
+state 41
+	decl_list : decl ';' decl_list .  (26)
+
+	.  reduce 26
+
+
+state 42
+	array_type : TYPE ID IS ARRAY . '(' constant DOTDOT constant ')' OF type_name  (34)
+
+	'('  shift 63
+	.  error
+
+
+state 43
+	record_type : TYPE ID IS RECORD . component_list ENDREC  (36)
+	component_list : .  (38)
+
+	ID  shift 7
+	ENDREC  reduce 38
+
+	id_list  goto 64
+	identifier  goto 10
+	variable_decl  goto 65
+	component_list  goto 66
+
+
+state 44
+	name_type : TYPE ID IS RANGE . constant DOTDOT constant  (40)
+
+	NUMBER  shift 67
+	.  error
+
+	constant  goto 68
+
+
+state 45
+	constant_type : id_list ':' CONSTANT ASSIGN . constant_expr  (41)
+
+	NUMBER  shift 69
+	.  error
+
+	constant_expr  goto 70
+
+
+state 46
+	raise_exc : RAISE . ID  (61)
+
+	ID  shift 71
+	.  error
+
+
+state 47
+	stmt_type : NULLWORD .  (46)
+
+	.  reduce 46
+
+
+state 48
+	loop_stmt : LOOP . seq_of_stmts loop_exit ENDLOOP  (53)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 72
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 49
+	if_stmt : IF . expression THEN seq_of_stmts if_cont ENDIF  (57)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 80
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 50
+	assignment_stmt : identifier . ASSIGN expression  (52)
+	proc_params : identifier . optional_params  (63)
+	proc_params : identifier .  (64)
+
+	ASSIGN  shift 84
+	'('  shift 85
+	';'  reduce 64
+
+	optional_params  goto 86
+
+
+state 51
+	procedure_call : proc_params .  (62)
+
+	.  reduce 62
+
+
+state 52
+	main_body : main_spec IS declarative_part BEG $$1 seq_of_stmts . except_part END ';'  (3)
+	except_part : .  (96)
+
+	EXCEPTION  shift 87
+	END  reduce 96
+
+	except_part  goto 88
+
+
+state 53
+	seq_of_stmts : stmt_type . ';' seq_of_stmts  (44)
+	seq_of_stmts : stmt_type . ';'  (45)
+
+	';'  shift 89
+	.  error
+
+
+state 54
+	stmt_type : assignment_stmt .  (47)
+
+	.  reduce 47
+
+
+state 55
+	stmt_type : procedure_call .  (48)
+
+	.  reduce 48
+
+
+state 56
+	stmt_type : loop_stmt .  (49)
+
+	.  reduce 49
+
+
+state 57
+	stmt_type : if_stmt .  (50)
+
+	.  reduce 50
+
+
+state 58
+	stmt_type : raise_exc .  (51)
+
+	.  reduce 51
+
+
+state 59
+	parameters : id_list . ':' mode type_name ';' parameters  (13)
+	parameters : id_list . ':' mode type_name  (14)
+
+	':'  shift 90
+	.  error
+
+
+state 60
+	procedure_spec : procedure_head '(' formal_param_part . ')'  (8)
+
+	')'  shift 91
+	.  error
+
+
+state 61
+	formal_param_part : parameters .  (11)
+
+	.  reduce 11
+
+
+state 62
+	procedure_body : procedure_spec IS $$2 . declarative_part BEG $$3 seq_of_stmts except_part END ';'  (7)
+	decl_list : .  (27)
+
+	ID  shift 7
+	TYPE  shift 8
+	BEG  reduce 27
+	PROCEDURE  reduce 27
+
+	id_list  goto 9
+	identifier  goto 10
+	declarative_part  goto 92
+	decl_list  goto 12
+	decl  goto 13
+	array_type  goto 14
+	record_type  goto 15
+	name_type  goto 16
+	variable_decl  goto 17
+	constant_type  goto 18
+	exception_type  goto 19
+
+
+state 63
+	array_type : TYPE ID IS ARRAY '(' . constant DOTDOT constant ')' OF type_name  (34)
+
+	NUMBER  shift 67
+	.  error
+
+	constant  goto 93
+
+
+state 64
+	variable_decl : id_list . ':' type_name  (39)
+
+	':'  shift 94
+	.  error
+
+
+state 65
+	component_list : variable_decl . ';' component_list  (37)
+
+	';'  shift 95
+	.  error
+
+
+state 66
+	record_type : TYPE ID IS RECORD component_list . ENDREC  (36)
+
+	ENDREC  shift 96
+	.  error
+
+
+state 67
+	constant : NUMBER .  (35)
+
+	.  reduce 35
+
+
+state 68
+	name_type : TYPE ID IS RANGE constant . DOTDOT constant  (40)
+
+	DOTDOT  shift 97
+	.  error
+
+
+state 69
+	constant_expr : NUMBER .  (43)
+
+	.  reduce 43
+
+
+state 70
+	constant_type : id_list ':' CONSTANT ASSIGN constant_expr .  (41)
+
+	.  reduce 41
+
+
+state 71
+	raise_exc : RAISE ID .  (61)
+
+	.  reduce 61
+
+
+state 72
+	loop_stmt : LOOP seq_of_stmts . loop_exit ENDLOOP  (53)
+	loop_exit : .  (56)
+
+	EXIT  shift 98
+	EXITWHEN  shift 99
+	ENDLOOP  reduce 56
+
+	loop_exit  goto 100
+
+
+state 73
+	primary : NUMBER .  (80)
+
+	.  reduce 80
+
+
+state 74
+	factor : NOT . primary  (78)
+
+	ID  shift 7
+	NUMBER  shift 73
+	'('  shift 75
+	.  error
+
+	identifier  goto 77
+	primary  goto 101
+
+
+state 75
+	primary : '(' . expression ')'  (82)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 102
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 76
+	factor : '-' . primary  (79)
+
+	ID  shift 7
+	NUMBER  shift 73
+	'('  shift 75
+	.  error
+
+	identifier  goto 77
+	primary  goto 103
+
+
+state 77
+	primary : identifier .  (81)
+
+	.  reduce 81
+
+
+state 78
+	factor : primary .  (76)
+	factor : primary . EXP primary  (77)
+
+	EXP  shift 104
+	THEN  reduce 76
+	AND  reduce 76
+	OR  reduce 76
+	EQ  reduce 76
+	NEQ  reduce 76
+	LT  reduce 76
+	GT  reduce 76
+	GTE  reduce 76
+	LTE  reduce 76
+	';'  reduce 76
+	')'  reduce 76
+	','  reduce 76
+	'-'  reduce 76
+	'+'  reduce 76
+	'*'  reduce 76
+	'/'  reduce 76
+
+
+state 79
+	simple_expr : term .  (72)
+	term : term . multiplying_op factor  (75)
+
+	'*'  shift 105
+	'/'  shift 106
+	THEN  reduce 72
+	AND  reduce 72
+	OR  reduce 72
+	EQ  reduce 72
+	NEQ  reduce 72
+	LT  reduce 72
+	GT  reduce 72
+	GTE  reduce 72
+	LTE  reduce 72
+	';'  reduce 72
+	')'  reduce 72
+	','  reduce 72
+	'-'  reduce 72
+	'+'  reduce 72
+
+	multiplying_op  goto 107
+
+
+state 80
+	if_stmt : IF expression . THEN seq_of_stmts if_cont ENDIF  (57)
+	expression : expression . boolean_op relation  (69)
+
+	THEN  shift 108
+	AND  shift 109
+	OR  shift 110
+	.  error
+
+	boolean_op  goto 111
+
+
+state 81
+	expression : relation .  (68)
+	relation : relation . relational_op simple_expr  (71)
+
+	EQ  shift 112
+	NEQ  shift 113
+	LT  shift 114
+	GT  shift 115
+	GTE  shift 116
+	LTE  shift 117
+	THEN  reduce 68
+	AND  reduce 68
+	OR  reduce 68
+	';'  reduce 68
+	')'  reduce 68
+	','  reduce 68
+
+	relational_op  goto 118
+
+
+state 82
+	term : factor .  (74)
+
+	.  reduce 74
+
+
+state 83
+	relation : simple_expr .  (70)
+	simple_expr : simple_expr . adding_op term  (73)
+
+	'-'  shift 119
+	'+'  shift 120
+	THEN  reduce 70
+	AND  reduce 70
+	OR  reduce 70
+	EQ  reduce 70
+	NEQ  reduce 70
+	LT  reduce 70
+	GT  reduce 70
+	GTE  reduce 70
+	LTE  reduce 70
+	';'  reduce 70
+	')'  reduce 70
+	','  reduce 70
+
+	adding_op  goto 121
+
+
+state 84
+	assignment_stmt : identifier ASSIGN . expression  (52)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 122
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 85
+	optional_params : '(' . function_params ')'  (65)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 123
+	function_params  goto 124
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 86
+	proc_params : identifier optional_params .  (63)
+
+	.  reduce 63
+
+
+state 87
+	except_part : EXCEPTION . exception_body  (95)
+	exception_body : .  (99)
+
+	WHEN  shift 125
+	END  reduce 99
+
+	exception_body  goto 126
+
+
+state 88
+	main_body : main_spec IS declarative_part BEG $$1 seq_of_stmts except_part . END ';'  (3)
+
+	END  shift 127
+	.  error
+
+
+state 89
+	seq_of_stmts : stmt_type ';' . seq_of_stmts  (44)
+	seq_of_stmts : stmt_type ';' .  (45)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	END  reduce 45
+	EXCEPTION  reduce 45
+	ELSEIF  reduce 45
+	ELSE  reduce 45
+	EXIT  reduce 45
+	WHEN  reduce 45
+	ENDIF  reduce 45
+	ENDLOOP  reduce 45
+	EXITWHEN  reduce 45
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 128
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 90
+	parameters : id_list ':' . mode type_name ';' parameters  (13)
+	parameters : id_list ':' . mode type_name  (14)
+	mode : .  (21)
+
+	IN  shift 129
+	OUT  shift 130
+	ID  reduce 21
+
+	mode  goto 131
+
+
+state 91
+	procedure_spec : procedure_head '(' formal_param_part ')' .  (8)
+
+	.  reduce 8
+
+
+state 92
+	procedure_body : procedure_spec IS $$2 declarative_part . BEG $$3 seq_of_stmts except_part END ';'  (7)
+
+	BEG  shift 132
+	.  error
+
+
+state 93
+	array_type : TYPE ID IS ARRAY '(' constant . DOTDOT constant ')' OF type_name  (34)
+
+	DOTDOT  shift 133
+	.  error
+
+
+state 94
+	variable_decl : id_list ':' . type_name  (39)
+
+	ID  shift 7
+	.  error
+
+	type_name  goto 33
+	identifier  goto 34
+
+
+state 95
+	component_list : variable_decl ';' . component_list  (37)
+	component_list : .  (38)
+
+	ID  shift 7
+	ENDREC  reduce 38
+
+	id_list  goto 64
+	identifier  goto 10
+	variable_decl  goto 65
+	component_list  goto 134
+
+
+state 96
+	record_type : TYPE ID IS RECORD component_list ENDREC .  (36)
+
+	.  reduce 36
+
+
+state 97
+	name_type : TYPE ID IS RANGE constant DOTDOT . constant  (40)
+
+	NUMBER  shift 67
+	.  error
+
+	constant  goto 135
+
+
+state 98
+	loop_exit : EXIT . ';'  (54)
+
+	';'  shift 136
+	.  error
+
+
+state 99
+	loop_exit : EXITWHEN . expression ';'  (55)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 137
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 100
+	loop_stmt : LOOP seq_of_stmts loop_exit . ENDLOOP  (53)
+
+	ENDLOOP  shift 138
+	.  error
+
+
+state 101
+	factor : NOT primary .  (78)
+
+	.  reduce 78
+
+
+state 102
+	expression : expression . boolean_op relation  (69)
+	primary : '(' expression . ')'  (82)
+
+	AND  shift 109
+	OR  shift 110
+	')'  shift 139
+	.  error
+
+	boolean_op  goto 111
+
+
+state 103
+	factor : '-' primary .  (79)
+
+	.  reduce 79
+
+
+state 104
+	factor : primary EXP . primary  (77)
+
+	ID  shift 7
+	NUMBER  shift 73
+	'('  shift 75
+	.  error
+
+	identifier  goto 77
+	primary  goto 140
+
+
+state 105
+	multiplying_op : '*' .  (93)
+
+	.  reduce 93
+
+
+state 106
+	multiplying_op : '/' .  (94)
+
+	.  reduce 94
+
+
+state 107
+	term : term multiplying_op . factor  (75)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	factor  goto 141
+
+
+state 108
+	if_stmt : IF expression THEN . seq_of_stmts if_cont ENDIF  (57)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 142
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 109
+	boolean_op : AND .  (83)
+
+	.  reduce 83
+
+
+state 110
+	boolean_op : OR .  (84)
+
+	.  reduce 84
+
+
+state 111
+	expression : expression boolean_op . relation  (69)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	relation  goto 143
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 112
+	relational_op : EQ .  (85)
+
+	.  reduce 85
+
+
+state 113
+	relational_op : NEQ .  (86)
+
+	.  reduce 86
+
+
+state 114
+	relational_op : LT .  (87)
+
+	.  reduce 87
+
+
+state 115
+	relational_op : GT .  (89)
+
+	.  reduce 89
+
+
+state 116
+	relational_op : GTE .  (90)
+
+	.  reduce 90
+
+
+state 117
+	relational_op : LTE .  (88)
+
+	.  reduce 88
+
+
+state 118
+	relation : relation relational_op . simple_expr  (71)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	factor  goto 82
+	simple_expr  goto 144
+
+
+state 119
+	adding_op : '-' .  (92)
+
+	.  reduce 92
+
+
+state 120
+	adding_op : '+' .  (91)
+
+	.  reduce 91
+
+
+state 121
+	simple_expr : simple_expr adding_op . term  (73)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 145
+	factor  goto 82
+
+
+state 122
+	assignment_stmt : identifier ASSIGN expression .  (52)
+	expression : expression . boolean_op relation  (69)
+
+	AND  shift 109
+	OR  shift 110
+	';'  reduce 52
+
+	boolean_op  goto 111
+
+
+state 123
+	function_params : expression . ',' function_params  (66)
+	function_params : expression .  (67)
+	expression : expression . boolean_op relation  (69)
+
+	AND  shift 109
+	OR  shift 110
+	','  shift 146
+	')'  reduce 67
+
+	boolean_op  goto 111
+
+
+state 124
+	optional_params : '(' function_params . ')'  (65)
+
+	')'  shift 147
+	.  error
+
+
+state 125
+	exception_body : WHEN . choice_sequence ARROW seq_of_stmts exception_body  (97)
+	exception_body : WHEN . OTHERS ARROW seq_of_stmts  (98)
+	choice_sequence : .  (102)
+
+	ID  shift 148
+	OTHERS  shift 149
+	'|'  shift 150
+	ARROW  reduce 102
+
+	choice_sequence  goto 151
+
+
+state 126
+	except_part : EXCEPTION exception_body .  (95)
+
+	.  reduce 95
+
+
+state 127
+	main_body : main_spec IS declarative_part BEG $$1 seq_of_stmts except_part END . ';'  (3)
+
+	';'  shift 152
+	.  error
+
+
+state 128
+	seq_of_stmts : stmt_type ';' seq_of_stmts .  (44)
+
+	.  reduce 44
+
+
+state 129
+	mode : IN .  (18)
+	mode : IN . OUT  (20)
+
+	OUT  shift 153
+	ID  reduce 18
+
+
+state 130
+	mode : OUT .  (19)
+
+	.  reduce 19
+
+
+state 131
+	parameters : id_list ':' mode . type_name ';' parameters  (13)
+	parameters : id_list ':' mode . type_name  (14)
+
+	ID  shift 7
+	.  error
+
+	type_name  goto 154
+	identifier  goto 34
+
+
+state 132
+	procedure_body : procedure_spec IS $$2 declarative_part BEG . $$3 seq_of_stmts except_part END ';'  (7)
+	$$3 : .  (6)
+
+	.  reduce 6
+
+	$$3  goto 155
+
+
+state 133
+	array_type : TYPE ID IS ARRAY '(' constant DOTDOT . constant ')' OF type_name  (34)
+
+	NUMBER  shift 67
+	.  error
+
+	constant  goto 156
+
+
+state 134
+	component_list : variable_decl ';' component_list .  (37)
+
+	.  reduce 37
+
+
+state 135
+	name_type : TYPE ID IS RANGE constant DOTDOT constant .  (40)
+
+	.  reduce 40
+
+
+state 136
+	loop_exit : EXIT ';' .  (54)
+
+	.  reduce 54
+
+
+state 137
+	loop_exit : EXITWHEN expression . ';'  (55)
+	expression : expression . boolean_op relation  (69)
+
+	AND  shift 109
+	OR  shift 110
+	';'  shift 157
+	.  error
+
+	boolean_op  goto 111
+
+
+state 138
+	loop_stmt : LOOP seq_of_stmts loop_exit ENDLOOP .  (53)
+
+	.  reduce 53
+
+
+state 139
+	primary : '(' expression ')' .  (82)
+
+	.  reduce 82
+
+
+state 140
+	factor : primary EXP primary .  (77)
+
+	.  reduce 77
+
+
+state 141
+	term : term multiplying_op factor .  (75)
+
+	.  reduce 75
+
+
+state 142
+	if_stmt : IF expression THEN seq_of_stmts . if_cont ENDIF  (57)
+	if_cont : .  (60)
+
+	ELSEIF  shift 158
+	ELSE  shift 159
+	ENDIF  reduce 60
+
+	if_cont  goto 160
+
+
+state 143
+	expression : expression boolean_op relation .  (69)
+	relation : relation . relational_op simple_expr  (71)
+
+	EQ  shift 112
+	NEQ  shift 113
+	LT  shift 114
+	GT  shift 115
+	GTE  shift 116
+	LTE  shift 117
+	THEN  reduce 69
+	AND  reduce 69
+	OR  reduce 69
+	';'  reduce 69
+	')'  reduce 69
+	','  reduce 69
+
+	relational_op  goto 118
+
+
+state 144
+	relation : relation relational_op simple_expr .  (71)
+	simple_expr : simple_expr . adding_op term  (73)
+
+	'-'  shift 119
+	'+'  shift 120
+	THEN  reduce 71
+	AND  reduce 71
+	OR  reduce 71
+	EQ  reduce 71
+	NEQ  reduce 71
+	LT  reduce 71
+	GT  reduce 71
+	GTE  reduce 71
+	LTE  reduce 71
+	';'  reduce 71
+	')'  reduce 71
+	','  reduce 71
+
+	adding_op  goto 121
+
+
+state 145
+	simple_expr : simple_expr adding_op term .  (73)
+	term : term . multiplying_op factor  (75)
+
+	'*'  shift 105
+	'/'  shift 106
+	THEN  reduce 73
+	AND  reduce 73
+	OR  reduce 73
+	EQ  reduce 73
+	NEQ  reduce 73
+	LT  reduce 73
+	GT  reduce 73
+	GTE  reduce 73
+	LTE  reduce 73
+	';'  reduce 73
+	')'  reduce 73
+	','  reduce 73
+	'-'  reduce 73
+	'+'  reduce 73
+
+	multiplying_op  goto 107
+
+
+state 146
+	function_params : expression ',' . function_params  (66)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 123
+	function_params  goto 161
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 147
+	optional_params : '(' function_params ')' .  (65)
+
+	.  reduce 65
+
+
+state 148
+	choice_sequence : ID . choice_sequence  (100)
+	choice_sequence : .  (102)
+
+	ID  shift 148
+	'|'  shift 150
+	ARROW  reduce 102
+
+	choice_sequence  goto 162
+
+
+state 149
+	exception_body : WHEN OTHERS . ARROW seq_of_stmts  (98)
+
+	ARROW  shift 163
+	.  error
+
+
+state 150
+	choice_sequence : '|' . ID choice_sequence  (101)
+
+	ID  shift 164
+	.  error
+
+
+state 151
+	exception_body : WHEN choice_sequence . ARROW seq_of_stmts exception_body  (97)
+
+	ARROW  shift 165
+	.  error
+
+
+state 152
+	main_body : main_spec IS declarative_part BEG $$1 seq_of_stmts except_part END ';' .  (3)
+
+	.  reduce 3
+
+
+state 153
+	mode : IN OUT .  (20)
+
+	.  reduce 20
+
+
+state 154
+	parameters : id_list ':' mode type_name . ';' parameters  (13)
+	parameters : id_list ':' mode type_name .  (14)
+
+	';'  shift 166
+	')'  reduce 14
+
+
+state 155
+	procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 . seq_of_stmts except_part END ';'  (7)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 167
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 156
+	array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant . ')' OF type_name  (34)
+
+	')'  shift 168
+	.  error
+
+
+state 157
+	loop_exit : EXITWHEN expression ';' .  (55)
+
+	.  reduce 55
+
+
+state 158
+	if_cont : ELSEIF . expression THEN seq_of_stmts if_cont  (58)
+
+	ID  shift 7
+	NUMBER  shift 73
+	NOT  shift 74
+	'('  shift 75
+	'-'  shift 76
+	.  error
+
+	identifier  goto 77
+	primary  goto 78
+	term  goto 79
+	expression  goto 169
+	relation  goto 81
+	factor  goto 82
+	simple_expr  goto 83
+
+
+state 159
+	if_cont : ELSE . seq_of_stmts  (59)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 170
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 160
+	if_stmt : IF expression THEN seq_of_stmts if_cont . ENDIF  (57)
+
+	ENDIF  shift 171
+	.  error
+
+
+state 161
+	function_params : expression ',' function_params .  (66)
+
+	.  reduce 66
+
+
+state 162
+	choice_sequence : ID choice_sequence .  (100)
+
+	.  reduce 100
+
+
+state 163
+	exception_body : WHEN OTHERS ARROW . seq_of_stmts  (98)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 172
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 164
+	choice_sequence : '|' ID . choice_sequence  (101)
+	choice_sequence : .  (102)
+
+	ID  shift 148
+	'|'  shift 150
+	ARROW  reduce 102
+
+	choice_sequence  goto 173
+
+
+state 165
+	exception_body : WHEN choice_sequence ARROW . seq_of_stmts exception_body  (97)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 174
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 166
+	parameters : id_list ':' mode type_name ';' . parameters  (13)
+
+	ID  shift 7
+	.  error
+
+	id_list  goto 59
+	identifier  goto 10
+	parameters  goto 175
+
+
+state 167
+	procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 seq_of_stmts . except_part END ';'  (7)
+	except_part : .  (96)
+
+	EXCEPTION  shift 87
+	END  reduce 96
+
+	except_part  goto 176
+
+
+state 168
+	array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant ')' . OF type_name  (34)
+
+	OF  shift 177
+	.  error
+
+
+state 169
+	if_cont : ELSEIF expression . THEN seq_of_stmts if_cont  (58)
+	expression : expression . boolean_op relation  (69)
+
+	THEN  shift 178
+	AND  shift 109
+	OR  shift 110
+	.  error
+
+	boolean_op  goto 111
+
+
+state 170
+	if_cont : ELSE seq_of_stmts .  (59)
+
+	.  reduce 59
+
+
+state 171
+	if_stmt : IF expression THEN seq_of_stmts if_cont ENDIF .  (57)
+
+	.  reduce 57
+
+
+state 172
+	exception_body : WHEN OTHERS ARROW seq_of_stmts .  (98)
+
+	.  reduce 98
+
+
+state 173
+	choice_sequence : '|' ID choice_sequence .  (101)
+
+	.  reduce 101
+
+
+state 174
+	exception_body : WHEN choice_sequence ARROW seq_of_stmts . exception_body  (97)
+	exception_body : .  (99)
+
+	WHEN  shift 125
+	END  reduce 99
+
+	exception_body  goto 179
+
+
+state 175
+	parameters : id_list ':' mode type_name ';' parameters .  (13)
+
+	.  reduce 13
+
+
+state 176
+	procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 seq_of_stmts except_part . END ';'  (7)
+
+	END  shift 180
+	.  error
+
+
+state 177
+	array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant ')' OF . type_name  (34)
+
+	ID  shift 7
+	.  error
+
+	type_name  goto 181
+	identifier  goto 34
+
+
+state 178
+	if_cont : ELSEIF expression THEN . seq_of_stmts if_cont  (58)
+
+	ID  shift 7
+	RAISE  shift 46
+	NULLWORD  shift 47
+	LOOP  shift 48
+	IF  shift 49
+	.  error
+
+	identifier  goto 50
+	proc_params  goto 51
+	seq_of_stmts  goto 182
+	stmt_type  goto 53
+	assignment_stmt  goto 54
+	procedure_call  goto 55
+	loop_stmt  goto 56
+	if_stmt  goto 57
+	raise_exc  goto 58
+
+
+state 179
+	exception_body : WHEN choice_sequence ARROW seq_of_stmts exception_body .  (97)
+
+	.  reduce 97
+
+
+state 180
+	procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 seq_of_stmts except_part END . ';'  (7)
+
+	';'  shift 183
+	.  error
+
+
+state 181
+	array_type : TYPE ID IS ARRAY '(' constant DOTDOT constant ')' OF type_name .  (34)
+
+	.  reduce 34
+
+
+state 182
+	if_cont : ELSEIF expression THEN seq_of_stmts . if_cont  (58)
+	if_cont : .  (60)
+
+	ELSEIF  shift 158
+	ELSE  shift 159
+	ENDIF  reduce 60
+
+	if_cont  goto 184
+
+
+state 183
+	procedure_body : procedure_spec IS $$2 declarative_part BEG $$3 seq_of_stmts except_part END ';' .  (7)
+
+	.  reduce 7
+
+
+state 184
+	if_cont : ELSEIF expression THEN seq_of_stmts if_cont .  (58)
+
+	.  reduce 58
+
+
+55 terminals, 54 nonterminals
+103 grammar rules, 185 states
